@@ -19,7 +19,8 @@ case class Project(
   tag: ValidationNel[String, Option[Tag]],
   function: ValidationNel[String, Option[Function]],
   naming: ValidationNel[String, Naming],
-  test: ValidationNel[String, Test]) {
+  test: ValidationNel[String, Test],
+  protobuf: ValidationNel[String, Option[ProtoBuf]]) {
 
   def _template: Template = {
     template match {
@@ -111,3 +112,4 @@ case class Naming(dataPrefix: String = "__", dataidQuery: String = "_dataid") {
   def response = s"${dataPrefix}response"
 }
 case class Test(reportRoot: Path)
+case class ProtoBuf(root: Path)

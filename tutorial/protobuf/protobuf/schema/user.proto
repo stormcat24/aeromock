@@ -1,0 +1,7 @@
+package protobuf.schema;
+
+message User {
+    required uint32 id = 1;
+    required string name = 2;
+    optional string description = 3;
+}

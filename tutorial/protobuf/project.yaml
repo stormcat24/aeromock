@@ -1,0 +1,11 @@
+data:
+  root: ./data
+
+static:
+  root: ../static
+
+ajax:
+  root: ../json/ajax
+
+protobuf:
+  root: ./protobuf

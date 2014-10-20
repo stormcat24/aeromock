@@ -21,3 +21,6 @@ bower_components/
 
 # test report
 aeromock_report/
+
+# protobuf
+aeromock-server/src/main/java/protobuf

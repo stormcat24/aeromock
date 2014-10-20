@@ -1,0 +1,8 @@
+package protobuf.api;
+
+import "schema/user.proto";
+
+message TestResponse {
+    required schema.User user1 = 1;
+    required schema.User user2 = 2;
+}

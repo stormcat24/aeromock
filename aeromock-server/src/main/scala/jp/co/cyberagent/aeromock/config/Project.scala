@@ -86,6 +86,14 @@ case class Project(
     }
   }
 
+  def _protobuf: ProtoBuf = {
+    protobuf match {
+      case Failure(errors) => throw new AeromockConfigurationException(projectConfig, errors)
+      case Success(None) => throw new AeromockConfigurationException(projectConfig, message"configuration.not.specified${"protobuf"}")
+      case Success(Some(value)) => value
+    }
+  }
+
   def templateScript: Path = root / "template.script"
   def dataScript: Path = root / "data.groovy"
   def ajaxScript: Path = root / "ajax.groovy"

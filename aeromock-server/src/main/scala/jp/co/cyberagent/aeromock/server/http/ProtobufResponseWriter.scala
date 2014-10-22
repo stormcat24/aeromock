@@ -5,10 +5,11 @@ import io.netty.channel.ChannelHandlerContext
 import io.netty.handler.codec.http.{HttpResponse, FullHttpRequest}
 import jp.co.cyberagent.aeromock.core.el.VariableHelper
 import jp.co.cyberagent.aeromock.core.http.VariableManager
-import jp.co.cyberagent.aeromock.{AeromockSystemException, AeromockApiNotFoundException}
+import jp.co.cyberagent.aeromock.{AeromockProtoParser, AeromockSystemException, AeromockApiNotFoundException}
 import jp.co.cyberagent.aeromock.config.Project
 import jp.co.cyberagent.aeromock.helper._
 import jp.co.cyberagent.aeromock.data.{DataFileReaderFactory, DataPathResolver}
+import jp.co.cyberagent.aeromock.protobuf._
 import scaldi.Injector
 import scala.collection.JavaConverters._
 
@@ -49,10 +50,8 @@ class ProtobufResponseWriter(implicit inj: Injector) extends HttpRequestProcesso
       throw new AeromockSystemException("not found proto")
     }
 
-    val result = ProtoSchemaParser.parse(protoFile.toFile)
-    val dependencies = result.getDependencies
-
-    println(dependencies)
+    val parser = new AeromockProtoParser(protobufRoot)
+    parser.parseProto(protoFile)
 
     ???
   }

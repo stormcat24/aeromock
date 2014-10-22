@@ -39,7 +39,9 @@ class ProtobufResponseWriter(implicit inj: Injector) extends HttpRequestProcesso
 
     val dataMap = DataFileReaderFactory.create(dataFile) match {
       case None => throw new AeromockSystemException(s"Cannot read Data file '${dataFile.toString}'")
-      case Some(reader) => reader.readFile(dataFile)
+      case Some(reader) => reader.readFile(dataFile).collect {
+        case (key, value) => (key, value)
+      }.toMap
     }
 
     val commonDataHelper = new CommonDataHelper(project._naming)
@@ -59,11 +61,14 @@ class ProtobufResponseWriter(implicit inj: Injector) extends HttpRequestProcesso
     // TODO rootのprotoを特定する仕組みが必要
 
     val rootType = result.types.get(result.types.keys.head).get
+    var bitField = 0x00000000
     rootType.map(f => {
       // TODO mapから値を取得
       // TODO optionalなら無くてもOK
       // TODO 型チェック
-      print(f.field.name)
+      val value = mergedMap.get(f.name)
+      bitField = bitField | f.bitField
+
     })
 
     ???

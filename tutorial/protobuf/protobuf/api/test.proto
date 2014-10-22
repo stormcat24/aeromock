@@ -4,6 +4,7 @@ import "schema/user.proto";
 
 message TestResponse {
     required int32 id = 1;
+    optional string description = 2;
     required schema.User user1 = 4;
     required schema.User user2 = 8;
 }

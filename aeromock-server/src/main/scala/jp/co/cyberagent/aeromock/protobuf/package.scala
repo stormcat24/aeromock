@@ -4,7 +4,7 @@ import java.io.File
 import java.nio.file.Path
 
 import com.google.protobuf.ByteString
-import com.squareup.protoparser.ProtoSchemaParser
+import com.squareup.protoparser.{MessageType, ProtoSchemaParser, Type}
 import jp.co.cyberagent.aeromock.helper._
 import scala.collection.JavaConverters._
 
@@ -17,17 +17,26 @@ package object protobuf {
 
   def getStringBytes(value: String): ByteString = ByteString.copyFromUtf8(value)
 
+  implicit class FieldExternal(value: MessageType.Field) {
+    lazy val tag = value.getTag
+    lazy val name = value.getName
+  }
+
 }
 
 class AeromockProtoParser(protobufRoot: Path) {
 
-  def parseProto(protoFile: Path) {
+  def parseProto(protoFile: Path): ParsedRootProto = {
 
+    // TODO getExtendDeclarations
     val result = ProtoSchemaParser.parse(protoFile.toFile)
     val allDeps = fetchDependencies(result.getDependencies.asScala.toSet)
-    println(allDeps)
+    val dependencyTypes = getDependencyTypes(allDeps)
+    val types = result.getTypes.asScala.toList.asInstanceOf[List[MessageType]].map(fetchType).toMap
+    println(types)
+    println(dependencyTypes)
 
-    println("finish")
+    ParsedRootProto(types, dependencyTypes)
   }
 
   def fetchDependencies(deps: Set[String]): Set[String] = {
@@ -37,35 +46,35 @@ class AeromockProtoParser(protobufRoot: Path) {
       fetchDependencies(result.getDependencies.asScala.toSet)
     })
   }
+
+  def getDependencyTypes(deps: Set[String]): Map[String, List[ProtoField]] = {
+    deps.toList.map(dep => {
+      val result = ProtoSchemaParser.parse((protobufRoot / dep).toFile)
+      result.getTypes.asScala.toList.asInstanceOf[List[MessageType]].map(fetchType).toMap
+    })
+    .foldLeft(Map.empty[String, List[ProtoField]])((left, right) => left ++ right)
+  }
+
+  def fetchType(t: MessageType): (String, List[ProtoField]) = {
+
+    var bitField = 1
+    val fields = t.getFields.asScala.sortBy(_.getTag).toList.zipWithIndex.map {
+      case (value, index) => {
+        bitField = if (index == 0) bitField else bitField << 1
+        ProtoField(value, bitField)
+      }
+    }
+
+    (t.getFullyQualifiedName -> fields)
+  }
 }
 
-case class ObjectDef(
-  name: String,
-  messageType: MessageType,
-  value: Any,
-  index: Int,
-  required: Boolean
+case class ProtoField(
+  field: MessageType.Field,
+  bitField: Int
 )
 
-
-object MessageType {
-  case object Double extends MessageType("double")
-  case object Float extends MessageType("float")
-  case object Int32 extends MessageType("int32")
-  case object Int64 extends MessageType("int64")
-  case object UInt32 extends MessageType("uint32")
-  case object UInt64 extends MessageType("uint64")
-  case object SInt32 extends MessageType("2int32")
-  case object SInt64 extends MessageType("2int64")
-  case object Fixed32 extends MessageType("fixed32")
-  case object Fixed64 extends MessageType("fixed64")
-  case object SFixed32 extends MessageType("sfixed32")
-  case object SFixed64 extends MessageType("sfixed64")
-  case object Bool extends MessageType("bool")
-  case object String extends MessageType("string")
-  case object Bytes extends MessageType("bytes")
-}
-
-sealed abstract class MessageType(val value: String) {
-
-}
+case class ParsedRootProto (
+  types: Map[String, List[ProtoField]],
+  dependencyTypes: Map[String, List[ProtoField]]
+)

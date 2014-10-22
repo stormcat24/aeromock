@@ -3,6 +3,7 @@ package protobuf.api;
 import "schema/user.proto";
 
 message TestResponse {
-    required schema.User user1 = 1;
-    required schema.User user2 = 2;
+    required int32 id = 1;
+    required schema.User user1 = 4;
+    required schema.User user2 = 8;
 }

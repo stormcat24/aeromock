@@ -4,7 +4,8 @@ import java.nio.file.Paths
 
 import com.google.protobuf.{CodedOutputStream, ByteString}
 import com.squareup.protoparser.ProtoSchemaParser
-import protobuf.schema.UserOuterClass
+import protobuf.api.Test.TestResponseOrBuilder
+import protobuf.schema.{JobOuterClass, UserOuterClass}
 
 /**
  *
@@ -40,25 +41,37 @@ object ProtoTest {
     binField = binField | 0x00000002
     binField = binField | 0x00000004
 
+
+
+    val job100 = JobOuterClass.Job.newBuilder().setId(100).setName("job100").build()
+    val job200 = JobOuterClass.Job.newBuilder().setId(200).setName("job200").build()
+
+    val status1 = UserOuterClass.UserStatus.newBuilder().setAge(20).setJob(job100).build()
+    val status2 = UserOuterClass.UserStatus.newBuilder().setAge(20).setJob(job200).build()
+
     val builder1 = UserOuterClass.User.newBuilder()
-    val builder2 = UserOuterClass.User.newBuilder()
-    val user1 = builder1.setId(1).setName("hoge1").setDescription("hoge1 hogehoge").build
+    val user1 = builder1.setId(1).setName("hoge1").setDescription("hoge1 hogehoge").setStatus(status1).build
+    val user2 = builder1.setId(2).setName("hoge2").setDescription("hoge2 hogehoge").setStatus(status2).build
 
-    val size = getSize(binField, user1)
+    val response = protobuf.api.Test.TestResponse.newBuilder().setId(1000).setUser1(user1).setUser2(user2).build()
+    response.toByteArray
+    println(response)
 
-    val array = new Array[Byte](size)
-    val output = CodedOutputStream.newInstance(array)
 
-    output.writeUInt32(1, user1.getId)
-    output.writeBytes(2, getBytes(user1.getName))
-    output.writeBytes(3, getBytes(user1.getDescription))
+//    val size = getSize(binField, user1)
+//
+//    val array = new Array[Byte](size)
+//    val output = CodedOutputStream.newInstance(array)
+//
+//    output.writeUInt32(1, user1.getId)
+//    output.writeBytes(2, getBytes(user1.getName))
+//    output.writeBytes(3, getBytes(user1.getDescription))
     // TODO ?
 //    getUnknownFields().writeTo(output);
-    println(array.toList)
+//    println(array.toList)
 
     //    final byte[] result = new byte[getSerializedSize()];
 //    final CodedOutputStream output = CodedOutputStream.newInstance(result);
-
 
     println(user1.toByteArray.toList)
 //    val user2 = builder2.setId(2).setName("hoge2").setDescription("hoge2 hogehoge").build

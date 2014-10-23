@@ -1,19 +1,10 @@
-id: 1000
-user1:
-  id: 1
-  name: hoge1
-  description: hoge1 hogehoge
-  status:
-    age: 20
-    job:
-      id: 100
-      name: job100
-user2:
-  id: 2
-  name: hoge2
-  description: hoge2 hogehoge
-  status:
-    age: 20
-    job:
-      id: 200
-      name: job200
+prop1: 100
+prop2: hogehogehoge
+prop3: 11111111111
+prop4:
+  - "1111"
+  - "2222"
+  - "3333"
+prop5:
+  id: 1000
+  name: nekotan

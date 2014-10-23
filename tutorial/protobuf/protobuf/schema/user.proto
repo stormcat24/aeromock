@@ -3,6 +3,11 @@ package protobuf.schema;
 import "schema/job.proto";
 option java_outer_classname = "UserOuterClass";
 
+message TestUser {
+    required uint32 id = 1;
+    required string name = 2;
+}
+
 message User {
     required uint32 id = 1;
     required string name = 2;

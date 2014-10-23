@@ -53,9 +53,17 @@ object ProtoTest {
     val user1 = builder1.setId(1).setName("hoge1").setDescription("hoge1 hogehoge").setStatus(status1).build
     val user2 = builder1.setId(2).setName("hoge2").setDescription("hoge2 hogehoge").setStatus(status2).build
 
-    val response = protobuf.api.Test.TestResponse.newBuilder().setId(1000).setUser1(user1).setUser2(user2).build()
-    response.toByteArray
-    println(response)
+    val response = protobuf.api.Test.TestResponse.newBuilder().setProp1(100).setProp2("hogehogehoge")
+      .setProp3(11111111111L)
+      .addProp4("1111")
+      .addProp4("2222")
+      .addProp4("3333")
+      .build()
+    println(response.toByteArray.toList)
+
+//    val response = protobuf.api.Test.TestResponse.newBuilder().setId(1000).setUser1(user1).setUser2(user2).build()
+//    response.toByteArray
+//    println(response)
 
 
 //    val size = getSize(binField, user1)

@@ -76,7 +76,8 @@ object AeromockBuild extends Build {
 
     ScoverageKeys.highlighting := true,
     scalacOptions += "-feature",
-    initialCommands in console := "import scalaz._, Scalaz._"
+    initialCommands in console := "import scalaz._, Scalaz._",
+    mainClass in Compile := Some("jp.co.cyberagent.aeromock.Aeromock")
   ) ++ instrumentSettings ++ coverallsSettings
 
   lazy val root = Project(

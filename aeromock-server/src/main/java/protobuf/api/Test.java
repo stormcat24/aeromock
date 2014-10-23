@@ -13,39 +13,55 @@ public final class Test {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>required int32 prop1 = 1;</code>
      */
-    boolean hasId();
+    boolean hasProp1();
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>required int32 prop1 = 1;</code>
      */
-    int getId();
+    int getProp1();
 
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    boolean hasUser1();
+    boolean hasProp2();
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    protobuf.schema.UserOuterClass.User getUser1();
+    java.lang.String getProp2();
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    protobuf.schema.UserOuterClass.UserOrBuilder getUser1OrBuilder();
+    com.google.protobuf.ByteString
+        getProp2Bytes();
 
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>required int64 prop3 = 3;</code>
      */
-    boolean hasUser2();
+    boolean hasProp3();
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>required int64 prop3 = 3;</code>
      */
-    protobuf.schema.UserOuterClass.User getUser2();
+    long getProp3();
+
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>repeated string prop4 = 4;</code>
      */
-    protobuf.schema.UserOuterClass.UserOrBuilder getUser2OrBuilder();
+    com.google.protobuf.ProtocolStringList
+        getProp4List();
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    int getProp4Count();
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    java.lang.String getProp4(int index);
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getProp4Bytes(int index);
   }
   /**
    * Protobuf type {@code protobuf.api.TestResponse}
@@ -101,33 +117,27 @@ public final class Test {
             }
             case 8: {
               bitField0_ |= 0x00000001;
-              id_ = input.readInt32();
+              prop1_ = input.readInt32();
+              break;
+            }
+            case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000002;
+              prop2_ = bs;
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              prop3_ = input.readInt64();
               break;
             }
             case 34: {
-              protobuf.schema.UserOuterClass.User.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000002) == 0x00000002)) {
-                subBuilder = user1_.toBuilder();
+              com.google.protobuf.ByteString bs = input.readBytes();
+              if (!((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+                prop4_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000008;
               }
-              user1_ = input.readMessage(protobuf.schema.UserOuterClass.User.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(user1_);
-                user1_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000002;
-              break;
-            }
-            case 66: {
-              protobuf.schema.UserOuterClass.User.Builder subBuilder = null;
-              if (((bitField0_ & 0x00000004) == 0x00000004)) {
-                subBuilder = user2_.toBuilder();
-              }
-              user2_ = input.readMessage(protobuf.schema.UserOuterClass.User.PARSER, extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(user2_);
-                user2_ = subBuilder.buildPartial();
-              }
-              bitField0_ |= 0x00000004;
+              prop4_.add(bs);
               break;
             }
           }
@@ -138,6 +148,9 @@ public final class Test {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e.getMessage()).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000008) == 0x00000008)) {
+          prop4_ = prop4_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -170,67 +183,112 @@ public final class Test {
     }
 
     private int bitField0_;
-    public static final int ID_FIELD_NUMBER = 1;
-    private int id_;
+    public static final int PROP1_FIELD_NUMBER = 1;
+    private int prop1_;
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>required int32 prop1 = 1;</code>
      */
-    public boolean hasId() {
+    public boolean hasProp1() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int32 id = 1;</code>
+     * <code>required int32 prop1 = 1;</code>
      */
-    public int getId() {
-      return id_;
+    public int getProp1() {
+      return prop1_;
     }
 
-    public static final int USER1_FIELD_NUMBER = 4;
-    private protobuf.schema.UserOuterClass.User user1_;
+    public static final int PROP2_FIELD_NUMBER = 2;
+    private java.lang.Object prop2_;
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    public boolean hasUser1() {
+    public boolean hasProp2() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    public protobuf.schema.UserOuterClass.User getUser1() {
-      return user1_;
+    public java.lang.String getProp2() {
+      java.lang.Object ref = prop2_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          prop2_ = s;
+        }
+        return s;
+      }
     }
     /**
-     * <code>required .protobuf.schema.User user1 = 4;</code>
+     * <code>required string prop2 = 2;</code>
      */
-    public protobuf.schema.UserOuterClass.UserOrBuilder getUser1OrBuilder() {
-      return user1_;
+    public com.google.protobuf.ByteString
+        getProp2Bytes() {
+      java.lang.Object ref = prop2_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        prop2_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
-    public static final int USER2_FIELD_NUMBER = 8;
-    private protobuf.schema.UserOuterClass.User user2_;
+    public static final int PROP3_FIELD_NUMBER = 3;
+    private long prop3_;
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>required int64 prop3 = 3;</code>
      */
-    public boolean hasUser2() {
+    public boolean hasProp3() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>required int64 prop3 = 3;</code>
      */
-    public protobuf.schema.UserOuterClass.User getUser2() {
-      return user2_;
+    public long getProp3() {
+      return prop3_;
+    }
+
+    public static final int PROP4_FIELD_NUMBER = 4;
+    private com.google.protobuf.LazyStringList prop4_;
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getProp4List() {
+      return prop4_;
     }
     /**
-     * <code>required .protobuf.schema.User user2 = 8;</code>
+     * <code>repeated string prop4 = 4;</code>
      */
-    public protobuf.schema.UserOuterClass.UserOrBuilder getUser2OrBuilder() {
-      return user2_;
+    public int getProp4Count() {
+      return prop4_.size();
+    }
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    public java.lang.String getProp4(int index) {
+      return prop4_.get(index);
+    }
+    /**
+     * <code>repeated string prop4 = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getProp4Bytes(int index) {
+      return prop4_.getByteString(index);
     }
 
     private void initFields() {
-      id_ = 0;
-      user1_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-      user2_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
+      prop1_ = 0;
+      prop2_ = "";
+      prop3_ = 0L;
+      prop4_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -238,23 +296,15 @@ public final class Test {
       if (isInitialized == 1) return true;
       if (isInitialized == 0) return false;
 
-      if (!hasId()) {
+      if (!hasProp1()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasUser1()) {
+      if (!hasProp2()) {
         memoizedIsInitialized = 0;
         return false;
       }
-      if (!hasUser2()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getUser1().isInitialized()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!getUser2().isInitialized()) {
+      if (!hasProp3()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -266,13 +316,16 @@ public final class Test {
                         throws java.io.IOException {
       getSerializedSize();
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
-        output.writeInt32(1, id_);
+        output.writeInt32(1, prop1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
-        output.writeMessage(4, user1_);
+        output.writeBytes(2, getProp2Bytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
-        output.writeMessage(8, user2_);
+        output.writeInt64(3, prop3_);
+      }
+      for (int i = 0; i < prop4_.size(); i++) {
+        output.writeBytes(4, prop4_.getByteString(i));
       }
       getUnknownFields().writeTo(output);
     }
@@ -285,15 +338,24 @@ public final class Test {
       size = 0;
       if (((bitField0_ & 0x00000001) == 0x00000001)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(1, id_);
+          .computeInt32Size(1, prop1_);
       }
       if (((bitField0_ & 0x00000002) == 0x00000002)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, user1_);
+          .computeBytesSize(2, getProp2Bytes());
       }
       if (((bitField0_ & 0x00000004) == 0x00000004)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(8, user2_);
+          .computeInt64Size(3, prop3_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < prop4_.size(); i++) {
+          dataSize += com.google.protobuf.CodedOutputStream
+            .computeBytesSizeNoTag(prop4_.getByteString(i));
+        }
+        size += dataSize;
+        size += 1 * getProp4List().size();
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -404,8 +466,6 @@ public final class Test {
       }
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
-          getUser1FieldBuilder();
-          getUser2FieldBuilder();
         }
       }
       private static Builder create() {
@@ -414,20 +474,14 @@ public final class Test {
 
       public Builder clear() {
         super.clear();
-        id_ = 0;
+        prop1_ = 0;
         bitField0_ = (bitField0_ & ~0x00000001);
-        if (user1Builder_ == null) {
-          user1_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-        } else {
-          user1Builder_.clear();
-        }
+        prop2_ = "";
         bitField0_ = (bitField0_ & ~0x00000002);
-        if (user2Builder_ == null) {
-          user2_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-        } else {
-          user2Builder_.clear();
-        }
+        prop3_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000004);
+        prop4_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
         return this;
       }
 
@@ -459,23 +513,20 @@ public final class Test {
         if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
           to_bitField0_ |= 0x00000001;
         }
-        result.id_ = id_;
+        result.prop1_ = prop1_;
         if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
           to_bitField0_ |= 0x00000002;
         }
-        if (user1Builder_ == null) {
-          result.user1_ = user1_;
-        } else {
-          result.user1_ = user1Builder_.build();
-        }
+        result.prop2_ = prop2_;
         if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
           to_bitField0_ |= 0x00000004;
         }
-        if (user2Builder_ == null) {
-          result.user2_ = user2_;
-        } else {
-          result.user2_ = user2Builder_.build();
+        result.prop3_ = prop3_;
+        if (((bitField0_ & 0x00000008) == 0x00000008)) {
+          prop4_ = prop4_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000008);
         }
+        result.prop4_ = prop4_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -492,37 +543,41 @@ public final class Test {
 
       public Builder mergeFrom(protobuf.api.Test.TestResponse other) {
         if (other == protobuf.api.Test.TestResponse.getDefaultInstance()) return this;
-        if (other.hasId()) {
-          setId(other.getId());
+        if (other.hasProp1()) {
+          setProp1(other.getProp1());
         }
-        if (other.hasUser1()) {
-          mergeUser1(other.getUser1());
+        if (other.hasProp2()) {
+          bitField0_ |= 0x00000002;
+          prop2_ = other.prop2_;
+          onChanged();
         }
-        if (other.hasUser2()) {
-          mergeUser2(other.getUser2());
+        if (other.hasProp3()) {
+          setProp3(other.getProp3());
+        }
+        if (!other.prop4_.isEmpty()) {
+          if (prop4_.isEmpty()) {
+            prop4_ = other.prop4_;
+            bitField0_ = (bitField0_ & ~0x00000008);
+          } else {
+            ensureProp4IsMutable();
+            prop4_.addAll(other.prop4_);
+          }
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
 
       public final boolean isInitialized() {
-        if (!hasId()) {
+        if (!hasProp1()) {
           
           return false;
         }
-        if (!hasUser1()) {
+        if (!hasProp2()) {
           
           return false;
         }
-        if (!hasUser2()) {
-          
-          return false;
-        }
-        if (!getUser1().isInitialized()) {
-          
-          return false;
-        }
-        if (!getUser2().isInitialized()) {
+        if (!hasProp3()) {
           
           return false;
         }
@@ -548,268 +603,237 @@ public final class Test {
       }
       private int bitField0_;
 
-      private int id_ ;
+      private int prop1_ ;
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>required int32 prop1 = 1;</code>
        */
-      public boolean hasId() {
+      public boolean hasProp1() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>required int32 prop1 = 1;</code>
        */
-      public int getId() {
-        return id_;
+      public int getProp1() {
+        return prop1_;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>required int32 prop1 = 1;</code>
        */
-      public Builder setId(int value) {
+      public Builder setProp1(int value) {
         bitField0_ |= 0x00000001;
-        id_ = value;
+        prop1_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>required int32 id = 1;</code>
+       * <code>required int32 prop1 = 1;</code>
        */
-      public Builder clearId() {
+      public Builder clearProp1() {
         bitField0_ = (bitField0_ & ~0x00000001);
-        id_ = 0;
+        prop1_ = 0;
         onChanged();
         return this;
       }
 
-      private protobuf.schema.UserOuterClass.User user1_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder> user1Builder_;
+      private java.lang.Object prop2_ = "";
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      public boolean hasUser1() {
+      public boolean hasProp2() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      public protobuf.schema.UserOuterClass.User getUser1() {
-        if (user1Builder_ == null) {
-          return user1_;
-        } else {
-          return user1Builder_.getMessage();
-        }
-      }
-      /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
-       */
-      public Builder setUser1(protobuf.schema.UserOuterClass.User value) {
-        if (user1Builder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
+      public java.lang.String getProp2() {
+        java.lang.Object ref = prop2_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            prop2_ = s;
           }
-          user1_ = value;
-          onChanged();
+          return s;
         } else {
-          user1Builder_.setMessage(value);
+          return (java.lang.String) ref;
         }
-        bitField0_ |= 0x00000002;
-        return this;
       }
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      public Builder setUser1(
-          protobuf.schema.UserOuterClass.User.Builder builderForValue) {
-        if (user1Builder_ == null) {
-          user1_ = builderForValue.build();
-          onChanged();
+      public com.google.protobuf.ByteString
+          getProp2Bytes() {
+        java.lang.Object ref = prop2_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          prop2_ = b;
+          return b;
         } else {
-          user1Builder_.setMessage(builderForValue.build());
+          return (com.google.protobuf.ByteString) ref;
         }
-        bitField0_ |= 0x00000002;
-        return this;
       }
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      public Builder mergeUser1(protobuf.schema.UserOuterClass.User value) {
-        if (user1Builder_ == null) {
-          if (((bitField0_ & 0x00000002) == 0x00000002) &&
-              user1_ != protobuf.schema.UserOuterClass.User.getDefaultInstance()) {
-            user1_ =
-              protobuf.schema.UserOuterClass.User.newBuilder(user1_).mergeFrom(value).buildPartial();
-          } else {
-            user1_ = value;
-          }
-          onChanged();
-        } else {
-          user1Builder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000002;
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
-       */
-      public Builder clearUser1() {
-        if (user1Builder_ == null) {
-          user1_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-          onChanged();
-        } else {
-          user1Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000002);
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
-       */
-      public protobuf.schema.UserOuterClass.User.Builder getUser1Builder() {
-        bitField0_ |= 0x00000002;
+      public Builder setProp2(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        prop2_ = value;
         onChanged();
-        return getUser1FieldBuilder().getBuilder();
+        return this;
       }
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      public protobuf.schema.UserOuterClass.UserOrBuilder getUser1OrBuilder() {
-        if (user1Builder_ != null) {
-          return user1Builder_.getMessageOrBuilder();
-        } else {
-          return user1_;
-        }
+      public Builder clearProp2() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        prop2_ = getDefaultInstance().getProp2();
+        onChanged();
+        return this;
       }
       /**
-       * <code>required .protobuf.schema.User user1 = 4;</code>
+       * <code>required string prop2 = 2;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
-          protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder> 
-          getUser1FieldBuilder() {
-        if (user1Builder_ == null) {
-          user1Builder_ = new com.google.protobuf.SingleFieldBuilder<
-              protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder>(
-                  getUser1(),
-                  getParentForChildren(),
-                  isClean());
-          user1_ = null;
-        }
-        return user1Builder_;
+      public Builder setProp2Bytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        prop2_ = value;
+        onChanged();
+        return this;
       }
 
-      private protobuf.schema.UserOuterClass.User user2_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-      private com.google.protobuf.SingleFieldBuilder<
-          protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder> user2Builder_;
+      private long prop3_ ;
       /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
+       * <code>required int64 prop3 = 3;</code>
        */
-      public boolean hasUser2() {
+      public boolean hasProp3() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
+       * <code>required int64 prop3 = 3;</code>
        */
-      public protobuf.schema.UserOuterClass.User getUser2() {
-        if (user2Builder_ == null) {
-          return user2_;
-        } else {
-          return user2Builder_.getMessage();
-        }
+      public long getProp3() {
+        return prop3_;
       }
       /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
+       * <code>required int64 prop3 = 3;</code>
        */
-      public Builder setUser2(protobuf.schema.UserOuterClass.User value) {
-        if (user2Builder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          user2_ = value;
-          onChanged();
-        } else {
-          user2Builder_.setMessage(value);
-        }
+      public Builder setProp3(long value) {
         bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
-       */
-      public Builder setUser2(
-          protobuf.schema.UserOuterClass.User.Builder builderForValue) {
-        if (user2Builder_ == null) {
-          user2_ = builderForValue.build();
-          onChanged();
-        } else {
-          user2Builder_.setMessage(builderForValue.build());
-        }
-        bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
-       */
-      public Builder mergeUser2(protobuf.schema.UserOuterClass.User value) {
-        if (user2Builder_ == null) {
-          if (((bitField0_ & 0x00000004) == 0x00000004) &&
-              user2_ != protobuf.schema.UserOuterClass.User.getDefaultInstance()) {
-            user2_ =
-              protobuf.schema.UserOuterClass.User.newBuilder(user2_).mergeFrom(value).buildPartial();
-          } else {
-            user2_ = value;
-          }
-          onChanged();
-        } else {
-          user2Builder_.mergeFrom(value);
-        }
-        bitField0_ |= 0x00000004;
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
-       */
-      public Builder clearUser2() {
-        if (user2Builder_ == null) {
-          user2_ = protobuf.schema.UserOuterClass.User.getDefaultInstance();
-          onChanged();
-        } else {
-          user2Builder_.clear();
-        }
-        bitField0_ = (bitField0_ & ~0x00000004);
-        return this;
-      }
-      /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
-       */
-      public protobuf.schema.UserOuterClass.User.Builder getUser2Builder() {
-        bitField0_ |= 0x00000004;
+        prop3_ = value;
         onChanged();
-        return getUser2FieldBuilder().getBuilder();
+        return this;
       }
       /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
+       * <code>required int64 prop3 = 3;</code>
        */
-      public protobuf.schema.UserOuterClass.UserOrBuilder getUser2OrBuilder() {
-        if (user2Builder_ != null) {
-          return user2Builder_.getMessageOrBuilder();
-        } else {
-          return user2_;
-        }
+      public Builder clearProp3() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        prop3_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList prop4_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureProp4IsMutable() {
+        if (!((bitField0_ & 0x00000008) == 0x00000008)) {
+          prop4_ = new com.google.protobuf.LazyStringArrayList(prop4_);
+          bitField0_ |= 0x00000008;
+         }
       }
       /**
-       * <code>required .protobuf.schema.User user2 = 8;</code>
+       * <code>repeated string prop4 = 4;</code>
        */
-      private com.google.protobuf.SingleFieldBuilder<
-          protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder> 
-          getUser2FieldBuilder() {
-        if (user2Builder_ == null) {
-          user2Builder_ = new com.google.protobuf.SingleFieldBuilder<
-              protobuf.schema.UserOuterClass.User, protobuf.schema.UserOuterClass.User.Builder, protobuf.schema.UserOuterClass.UserOrBuilder>(
-                  getUser2(),
-                  getParentForChildren(),
-                  isClean());
-          user2_ = null;
-        }
-        return user2Builder_;
+      public com.google.protobuf.ProtocolStringList
+          getProp4List() {
+        return prop4_.getUnmodifiableView();
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public int getProp4Count() {
+        return prop4_.size();
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public java.lang.String getProp4(int index) {
+        return prop4_.get(index);
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getProp4Bytes(int index) {
+        return prop4_.getByteString(index);
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public Builder setProp4(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureProp4IsMutable();
+        prop4_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public Builder addProp4(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureProp4IsMutable();
+        prop4_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public Builder addAllProp4(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureProp4IsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, prop4_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public Builder clearProp4() {
+        prop4_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>repeated string prop4 = 4;</code>
+       */
+      public Builder addProp4Bytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureProp4IsMutable();
+        prop4_.add(value);
+        onChanged();
+        return this;
       }
 
       // @@protoc_insertion_point(builder_scope:protobuf.api.TestResponse)
@@ -838,9 +862,9 @@ public final class Test {
   static {
     java.lang.String[] descriptorData = {
       "\n\016api/test.proto\022\014protobuf.api\032\021schema/u" +
-      "ser.proto\"f\n\014TestResponse\022\n\n\002id\030\001 \002(\005\022$\n" +
-      "\005user1\030\004 \002(\0132\025.protobuf.schema.User\022$\n\005u" +
-      "ser2\030\010 \002(\0132\025.protobuf.schema.User"
+      "ser.proto\"J\n\014TestResponse\022\r\n\005prop1\030\001 \002(\005" +
+      "\022\r\n\005prop2\030\002 \002(\t\022\r\n\005prop3\030\003 \002(\003\022\r\n\005prop4\030" +
+      "\004 \003(\t"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -860,7 +884,7 @@ public final class Test {
     internal_static_protobuf_api_TestResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_protobuf_api_TestResponse_descriptor,
-        new java.lang.String[] { "Id", "User1", "User2", });
+        new java.lang.String[] { "Prop1", "Prop2", "Prop3", "Prop4", });
     protobuf.schema.UserOuterClass.getDescriptor();
   }
 

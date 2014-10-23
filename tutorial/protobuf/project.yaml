@@ -9,3 +9,4 @@ ajax:
 
 protobuf:
   root: ./protobuf
+  apiPrefix: /api

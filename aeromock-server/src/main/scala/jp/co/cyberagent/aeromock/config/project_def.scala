@@ -398,6 +398,7 @@ class TestDef {
 class ProtoBufDef {
   // protobuf
   @BeanProperty var root: String = null
+  @BeanProperty var apiPrefix: String = null
 
   def toValue(projectRoot: Path): ValidationNel[String, Option[ProtoBuf]] = {
 

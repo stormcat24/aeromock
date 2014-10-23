@@ -60,17 +60,14 @@ package object protobuf {
 
     def fetchType(tuple: (String, MessageType)): (String, List[ProtoField]) = {
 
-      var bitField = 1
       val fields = tuple._2.getFields.asScala.sortBy(_.getTag).toList.zipWithIndex.map {
         case (value, index) => {
-          bitField = if (index == 0) bitField else bitField << 1
           ProtoField(
             label = ProtoFieldLabel.valueOf(value.getLabel),
             `type` = ProtoFieldType.valueOf(value.getType),
             name = value.getName,
             tag = value.getTag,
-            documentation = value.getDocumentation,
-            bitField = bitField
+            documentation = value.getDocumentation
           )
         }
       }
@@ -87,8 +84,7 @@ package object protobuf {
     name: String,
     tag: Int,
     // TODO OPTION
-    documentation: String,
-    bitField: Int
+    documentation: String
   )
 
   sealed abstract class ProtoFieldLabel
@@ -301,7 +297,6 @@ package object protobuf {
   )
 
   case class ProtoProxyObject(
-    bitField: Int,
     values: List[ProtoProxyValue[_, _]]
   ) {
 
@@ -311,7 +306,6 @@ package object protobuf {
       val result = new Array[Byte](serializedSize)
       val output = CodedOutputStream.newInstance(result)
       values.map(_.write(output))
-      // TODO write
       output.checkNoSpaceLeft
       result
     }

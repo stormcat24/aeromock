@@ -418,8 +418,14 @@ class ProtoBufDef {
       }
     }
 
+    val apiPrefixResult = Option(apiPrefix) match {
+      case None => none[String].successNel[String]
+      case Some(s) if StringUtils.isNotBlank(s) => s.some.successNel[String]
+    }
+
     for {
       protobufRoot <- rootResult
-    } yield (ProtoBuf(protobufRoot).some)
+      protobufApiPrefix <- apiPrefixResult
+    } yield (ProtoBuf(protobufRoot, protobufApiPrefix).some)
   }
 }

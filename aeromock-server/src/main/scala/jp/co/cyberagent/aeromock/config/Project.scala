@@ -118,6 +118,7 @@ case class Naming(dataPrefix: String = "__", dataidQuery: String = "_dataid") {
   def additional = s"${dataPrefix}additional"
   def debug = s"${dataPrefix}debug"
   def response = s"${dataPrefix}response"
+  def `type` = s"${dataPrefix}type"
 }
 case class Test(reportRoot: Path)
-case class ProtoBuf(root: Path)
+case class ProtoBuf(root: Path, apiPrefix: Option[String])

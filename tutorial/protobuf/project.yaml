@@ -1,3 +1,7 @@
+protobuf:
+  root: ./protobuf
+  apiPrefix: /api
+
 data:
   root: ./data
 
@@ -6,7 +10,3 @@ static:
 
 ajax:
   root: ../json/ajax
-
-protobuf:
-  root: ./protobuf
-  apiPrefix: /api

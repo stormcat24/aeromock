@@ -111,7 +111,7 @@ class ProtobufResponseWriter(implicit inj: Injector) extends HttpRequestProcesso
           case tt @ BOOL => ProtoProxyListValue(tt, value.asInstanceOf[List[Boolean]], tag)
           case tt @ STRING => ProtoProxyListValue(tt, value.asInstanceOf[List[String]], tag)
           case tt @ BYTES => ProtoProxyListValue(tt, value.asInstanceOf[List[String]].map(ByteString.copyFromUtf8(_)), tag) // TODO
-          case _ => throw new RuntimeException("unsupported type") // TODO
+          case _ => throw new AeromockSystemException(s"type name '${t.typeName}' is not supported.")
         }
       }
       case f @ ProtoField(_, t, _, tag, _) => {
@@ -131,7 +131,7 @@ class ProtobufResponseWriter(implicit inj: Injector) extends HttpRequestProcesso
           case tt @ BOOL => ProtoProxySingleValue(tt, value.asInstanceOf[Boolean], tag)
           case tt @ STRING => ProtoProxySingleValue(tt, value.asInstanceOf[String], tag)
           case tt @ BYTES => ProtoProxySingleValue(tt, ByteString.copyFromUtf8(value.asInstanceOf[String]), tag)
-          case _ => throw new RuntimeException("unsupported type") // TODO
+          case _ => throw new AeromockSystemException(s"type name '${t.typeName}' is not supported.")
         }
       }
     }

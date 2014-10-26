@@ -5,6 +5,8 @@ import java.nio.file.Path
 import jp.co.cyberagent.aeromock.helper._
 import com.squareup.protoparser.{MessageType, ProtoSchemaParser}
 import scala.collection.JavaConverters._
+import scalaz._
+import Scalaz._
 
 /**
  *
@@ -19,18 +21,25 @@ class AeromockProtoParser(protobufRoot: Path) {
     val allDeps = fetchDependencies(result.getDependencies.asScala.toSet)
     val dependencyTypes = getDependencyTypes(allDeps)
     val types = result.getTypes.asScala.map {
-      case mt: MessageType => ("root", mt) // TODO
+      case mt: MessageType => {
+        val nestedTypes = mt.getNestedTypes.asScala.toList
+        println(nestedTypes)
+        (mt.getName, mt)
+      }
     }.map(fetchType).toMap
 
     ParsedRootProto(types, dependencyTypes)
   }
 
   def fetchDependencies(deps: Set[String]): Set[String] = {
-    // TODO 存在チェックすべきか？
-    deps ++ deps.map(protobufRoot / _).filter(_.exists).flatMap(dep => {
-      val result = ProtoSchemaParser.parse(dep.toFile)
-      fetchDependencies(result.getDependencies.asScala.toSet)
-    })
+    deps ++ deps.map(protobufRoot / _).flatMap { path =>
+      if (path.exists) {
+        val result = ProtoSchemaParser.parse(path.toFile)
+        fetchDependencies(result.getDependencies.asScala.toSet)
+      } else {
+        throw new RuntimeException(s"${path} is not found.") // TODO
+      }
+    }
   }
 
   def getDependencyTypes(deps: Set[String]): Map[String, List[ProtoField]] = {

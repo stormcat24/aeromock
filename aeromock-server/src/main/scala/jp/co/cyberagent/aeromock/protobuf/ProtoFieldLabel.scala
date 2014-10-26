@@ -1,6 +1,7 @@
 package jp.co.cyberagent.aeromock.protobuf
 
 import com.squareup.protoparser.MessageType
+import jp.co.cyberagent.aeromock.AeromockSystemException
 
 /**
  *
@@ -25,7 +26,7 @@ object ProtoFieldLabel {
   def valueOf(label: MessageType.Label): ProtoFieldLabel = {
     map.get(label) match {
       case Some(v) => v
-      case _ => throw new RuntimeException("TODO") // TODO
+      case _ => throw new AeromockSystemException(s"label '${label.toString}' is not supported.")
     }
   }
 }

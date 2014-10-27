@@ -33,7 +33,7 @@ trait TemplateService extends AnyRef with ResponseDataSupport with Injectable {
    * @param request [[io.netty.handler.codec.http.FullHttpRequest]]
    * @return HTML string
    */
-  def render(request: FullHttpRequest): RenderResult = {
+  def render(request: FullHttpRequest): RenderResult[String] = {
     require(request != null)
 
     if (request.queryString.contains(s"${project._naming.debug}=true")) {
@@ -51,7 +51,7 @@ trait TemplateService extends AnyRef with ResponseDataSupport with Injectable {
     }
   }
 
-  def renderProcess(request: ParsedRequest): Either[Throwable, RenderResult] = {
+  def renderProcess(request: ParsedRequest): Either[Throwable, RenderResult[String]] = {
     val response = createResponseDataWithProjection(project, request)
 
     trye {

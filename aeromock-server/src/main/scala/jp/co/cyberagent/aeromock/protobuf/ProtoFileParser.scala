@@ -2,33 +2,28 @@ package jp.co.cyberagent.aeromock.protobuf
 
 import java.nio.file.Path
 
+import com.squareup.protoparser.{EnumType, MessageType, ProtoSchemaParser}
 import jp.co.cyberagent.aeromock.helper._
-import com.squareup.protoparser.{MessageType, ProtoSchemaParser}
+
 import scala.collection.JavaConverters._
-import scalaz._
-import Scalaz._
 
 /**
  *
  * @author stormcat24
  */
-class AeromockProtoParser(protobufRoot: Path) {
+class ProtoFileParser(protobufRoot: Path) {
 
-  def parseProto(protoFile: Path): ParsedRootProto = {
+  def parseProto(protoFile: Path): ParsedProto = {
 
     // TODO getExtendDeclarations
     val result = ProtoSchemaParser.parse(protoFile.toFile)
     val allDeps = fetchDependencies(result.getDependencies.asScala.toSet)
     val dependencyTypes = getDependencyTypes(allDeps)
     val types = result.getTypes.asScala.map {
-      case mt: MessageType => {
-        val nestedTypes = mt.getNestedTypes.asScala.toList
-        println(nestedTypes)
-        (mt.getName, mt)
-      }
+      case mt: MessageType => (mt.getName, mt)
     }.map(fetchType).toMap
 
-    ParsedRootProto(types, dependencyTypes)
+    ParsedProto(types, dependencyTypes)
   }
 
   def fetchDependencies(deps: Set[String]): Set[String] = {
@@ -54,9 +49,19 @@ class AeromockProtoParser(protobufRoot: Path) {
 
   def fetchType(tuple: (String, MessageType)): (String, List[ProtoField]) = {
 
+    // TODO nest対応
+    val netstedTypes = tuple._2.getNestedTypes.asScala.collect {
+      case et: EnumType => (et.getName, et.getValues.asScala.toList)
+    }.toMap
+
     val fields = tuple._2.getFields.asScala.sortBy(_.getTag).toList.zipWithIndex.map {
       case (value, index) => {
-        val fieldType = ProtoFieldType.valueOf(value.getType)
+
+        val fieldType = netstedTypes.get(value.getType) match {
+          case Some(enumType) => ProtoFieldType.ENUM(value.getType, enumType.map(e => (e.getName -> e.getTag)).toMap)
+          case _ => ProtoFieldType.valueOf(value.getType)
+        }
+
         val defaultValue = value.getOptions.asScala.collectFirst {
           case o if o.getName == "default" => fieldType.toDefaultValue(o.getValue.toString)
         }

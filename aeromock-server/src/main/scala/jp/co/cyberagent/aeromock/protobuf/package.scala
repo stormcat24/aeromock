@@ -1,9 +1,12 @@
 package jp.co.cyberagent.aeromock
 
 import com.google.protobuf.{ByteString, CodedOutputStream}
-import com.squareup.protoparser.MessageType
 
 import scala.language.experimental
+import scala.reflect.ClassTag
+import jp.co.cyberagent.aeromock.helper._
+import scalaz._
+import Scalaz._
 
 /**
  *
@@ -11,7 +14,32 @@ import scala.language.experimental
  */
 package object protobuf {
 
-  def getStringBytes(value: String): ByteString = ByteString.copyFromUtf8(value)
+  def getByteString(value: String): ByteString = ByteString.copyFromUtf8(value)
+
+  def cast[A](value: Any)(implicit tag: ClassTag[A]): Either[Throwable, A] = {
+
+    value match {
+      case string: CharSequence => doCast[A](string.toString)
+      case i: Number => doCast[A](i.toString)
+    }
+  }
+
+  val TypeString = classOf[String]
+  val TypeInt = classOf[Int]
+  val TypeLong = classOf[Long]
+  val TypeFloat = classOf[Float]
+  val TypeDouble = classOf[Double]
+
+  private[protobuf] def doCast[A](value: String)(implicit tag: ClassTag[A]): Either[Throwable, A] = {
+    trye((implicitly[ClassTag[A]].runtimeClass match {
+      case TypeString => value.toString
+      case TypeInt => value.toInt
+      case TypeLong => value.toLong
+      case TypeFloat => value.toFloat
+      case TypeDouble => value.toDouble
+    }).asInstanceOf[A])
+  }
+
 
   case class ProtoField(
     label: ProtoFieldLabel,
@@ -19,11 +47,6 @@ package object protobuf {
     name: String,
     tag: Int,
     defaultValue: Option[Either[Throwable, Any]] = None
-  )
-
-  case class ParsedRootProto(
-    types: Map[String, List[ProtoField]],
-    dependencyTypes: Map[String, List[ProtoField]]
   )
 
   case class ProtoProxyObject(
@@ -82,6 +105,7 @@ package object protobuf {
     }
 
   }
+
 }
 
 

@@ -3,7 +3,7 @@ name := "aeromock-server"
 description := "Aeromock server daemon."
 
 libraryDependencies ++= Seq(
-  "io.netty" % "netty-all" % "4.0.21.Final",
+  "io.netty" % "netty-all" % nettyVersion,
   "org.json4s" %% "json4s-native" % "3.2.10",
   "org.yaml" % "snakeyaml" % "1.13",
   "joda-time" % "joda-time" % "2.3",

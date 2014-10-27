@@ -45,8 +45,7 @@ package object protobuf {
     label: ProtoFieldLabel,
     `type`: ProtoFieldType[_],
     name: String,
-    tag: Int,
-    defaultValue: Option[Either[Throwable, Any]] = None
+    tag: Int
   )
 
   case class ProtoProxyObject(

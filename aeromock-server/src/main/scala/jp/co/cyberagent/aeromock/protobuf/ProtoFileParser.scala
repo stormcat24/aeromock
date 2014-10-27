@@ -62,15 +62,11 @@ class ProtoFileParser(protobufRoot: Path) {
           case _ => ProtoFieldType.valueOf(value.getType)
         }
 
-        val defaultValue = value.getOptions.asScala.collectFirst {
-          case o if o.getName == "default" => fieldType.toDefaultValue(o.getValue.toString)
-        }
         ProtoField(
           label = ProtoFieldLabel.valueOf(value.getLabel),
           `type` = fieldType,
           name = value.getName,
-          tag = value.getTag,
-          defaultValue
+          tag = value.getTag
         )
       }
     }

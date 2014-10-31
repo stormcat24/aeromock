@@ -44,13 +44,16 @@ class ProtoFileParser(protobufRoot: Path) {
   }
 
   def getDependencyTypes(deps: Set[String]): Map[String, List[ProtoField]] = {
-    deps.toList.map(dep => {
+    val map = deps.toList.map(dep => {
       val result = ProtoSchemaParser.parse((protobufRoot / dep).toFile)
       result.getTypes.asScala.map {
         case mt: MessageType => (dep, mt, result)
-      }.map(fetchType).toMap
+      }.map(fetchType).toList.sequenceU match {
+        case Success(s) => s.toMap
+        case Failure(f) => throw new RuntimeException("TODO") // TODO
+      }
     })
-      .foldLeft(Map.empty[String, List[ProtoField]])((left, right) => left ++ right)
+      map.foldLeft(Map.empty[String, List[ProtoField]])((left, right) => left ++ right)
   }
 
   def fetchType(tuple: (String, MessageType, ProtoFile)): ValidationNel[String, (String, List[ProtoField])] = {

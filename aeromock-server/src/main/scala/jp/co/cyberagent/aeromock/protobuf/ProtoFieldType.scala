@@ -5,6 +5,12 @@ import com.google.protobuf.{ByteString, CodedOutputStream}
 import com.google.protobuf.CodedOutputStream._
 import com.squareup.protoparser.MessageType
 import jp.co.cyberagent.aeromock.protobuf.ProtoFieldLabel._
+import jp.co.cyberagent.aeromock.helper._
+
+import scalaz._
+import Scalaz._
+
+import scala.collection.JavaConverters._
 
 /**
  *
@@ -17,16 +23,59 @@ sealed abstract class ProtoFieldType[A] {
   def computeSizeNoTag(value: A): Int
   def write(output: CodedOutputStream, tag: Int, value: A): Unit
   def writeNoTag(output: CodedOutputStream, value: A): Unit
-  def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): A
-  def toValue(value: Option[Any], tag: Int, dependencies: Map[String, List[ProtoField]]): Option[ProtoProxyValue[_, _]] = {
+  def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, A]
+
+  def toValue(name: String, value: Option[Any], tag: Int, dependencies: Map[String, List[ProtoField]]): ValidationNel[String, Option[ProtoProxyValue[_, _]]] = {
     (label, value) match {
-      case (OPTIONAL, None) => None
-      case (OPTIONAL, Some(v)) => Some(ProtoProxySingleValue(this, cast(v, dependencies, tag), tag))
-      case (REPEATED, Some(list: List[Any])) => Some(ProtoProxyListValue(this, list.map(cast(_, dependencies, tag)), tag))
-      case (REPEATED, Some(_)) => throw new RuntimeException("TODO list型ではありません")
-      case (REPEATED, _) => Some(ProtoProxyListValue(this, List.empty, tag))
-      case (REQUIRED, Some(v)) => Some(ProtoProxySingleValue(this, cast(v, dependencies, tag), tag))
-      case (REQUIRED, _) => throw new RuntimeException("TODO 値が指定されていません")
+      case (OPTIONAL, None) => none[ProtoProxyValue[_, _]].successNel[String]
+      case (OPTIONAL, Some(v)) => {
+        cast(v, dependencies, tag) match {
+          case Success(s) => ProtoProxySingleValue(this, s, tag).some.successNel[String]
+          case Failure(errors) => {
+            val error =
+              s"""> [Illegal type] at ${label} ${typeName} ${name} = ${tag}
+                 |>> actual value is ${v}""".stripMargin
+            error.failureNel[Option[ProtoProxyValue[_, _]]]
+          }
+        }
+      }
+      case (REPEATED, Some(list: List[Any])) => {
+        list.map(cast(_, dependencies, tag) match {
+          case Success(s) => s.successNel[String]
+          case Failure(errors) => {
+            val error =
+              s"""> [element of array is illegal type] at ${label} ${typeName} ${name} = ${tag}
+                 |>> actual value is ${list.asJava}""".stripMargin
+            error.failureNel[A]
+          }
+        }).sequenceU match {
+          case Success(s) => ProtoProxyListValue(this, s, tag).some.successNel[String]
+          case Failure(errors) => {
+            errors.toList.mkString("\n").failureNel[Option[ProtoProxyValue[_, _]]]
+          }
+        }
+      }
+      case (REPEATED, Some(v)) => {
+        val error =
+          s"""> [Not array data] at ${label} ${typeName} ${name} = ${tag}
+             |>> actual value is ${v}""".stripMargin
+        error.failureNel[Option[ProtoProxyValue[_, _]]]
+      }
+      case (REPEATED, _) => ProtoProxyListValue(this, List.empty, tag).asInstanceOf[ProtoProxyValue[_, _]].some.successNel[String]
+      case (REQUIRED, Some(v)) => {
+        cast(v, dependencies, tag) match {
+          case Success(s) => ProtoProxySingleValue(this, s, tag).some.successNel[String]
+          case Failure(errors) => {
+            val error =
+              s"""> [Illegal type] at ${label} ${typeName} ${name} = ${tag}
+                 |>> actual value is ${v}""".stripMargin
+            error.failureNel[Option[ProtoProxyValue[_, _]]]
+          }
+        }
+      }
+      case (REQUIRED, _) => {
+        s"> [Not specified data] at ${label} ${typeName} ${name} = ${tag}".failureNel[Option[ProtoProxyValue[_, _]]]
+      }
     }
   }
 }
@@ -39,7 +88,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Double): Int = computeDoubleSizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Double): Unit = output.writeDouble(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Double): Unit = output.writeDoubleNoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Double = value.toString.toDouble
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Double] = {
+      trye(value.toString.toDouble) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Double]
+      }
+    }
   }
 
   case class FLOAT(label: ProtoFieldLabel) extends ProtoFieldType[Float] {
@@ -48,7 +102,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Float): Int = computeFloatSizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Float): Unit = output.writeFloat(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Float): Unit = output.writeFloatNoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Float = value.toString.toFloat
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Float] = {
+      trye(value.toString.toFloat) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Float]
+      }
+    }
   }
 
   case class INT32(label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -57,7 +116,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeInt32SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeInt32(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeInt32NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = value.toString.toInt
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = {
+      trye(value.toString.toInt) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Int]
+      }
+    }
   }
 
   case class INT64(label: ProtoFieldLabel) extends ProtoFieldType[Long] {
@@ -66,7 +130,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Long): Int = computeInt64SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Long): Unit = output.writeInt64(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Long): Unit = output.writeInt64NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Long = value.toString.toLong
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Long] = {
+      trye(value.toString.toLong) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Long]
+      }
+    }
   }
 
   case class UINT32(label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -75,7 +144,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeUInt32SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeUInt32(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeUInt32NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = value.toString.toInt
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = {
+      trye(value.toString.toInt) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Int]
+      }
+    }
   }
 
   case class UINT64(label: ProtoFieldLabel) extends ProtoFieldType[Long] {
@@ -84,7 +158,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Long): Int = computeUInt64SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Long): Unit = output.writeUInt64(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Long): Unit = output.writeUInt64NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Long = value.toString.toLong
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Long] = {
+      trye(value.toString.toLong) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Long]
+      }
+    }
   }
 
   case class SINT32(label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -93,7 +172,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeSInt32SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeSInt32(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeSInt32NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = value.toString.toInt
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = {
+      trye(value.toString.toInt) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Int]
+      }
+    }
   }
 
   case class SINT64(label: ProtoFieldLabel) extends ProtoFieldType[Long] {
@@ -102,7 +186,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Long): Int = computeSInt64SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Long): Unit = output.writeSInt64(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Long): Unit = output.writeSInt64NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Long = value.toString.toLong
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Long] = {
+      trye(value.toString.toLong) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Long]
+      }
+    }
   }
 
   case class FIXED32(label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -111,7 +200,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeFixed32SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeFixed32(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeFixed32NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = value.toString.toInt
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = {
+      trye(value.toString.toInt) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Int]
+      }
+    }
   }
 
   case class FIXED64(label: ProtoFieldLabel) extends ProtoFieldType[Long] {
@@ -120,7 +214,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Long): Int = computeFixed64SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Long): Unit = output.writeFixed64(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Long): Unit = output.writeFixed64NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Long = value.toString.toLong
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Long] = {
+      trye(value.toString.toLong) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Long]
+      }
+    }
   }
 
   case class SFIXED32(label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -129,7 +228,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeSFixed32SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeSFixed32(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeSFixed32NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = value.toString.toInt
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = {
+      trye(value.toString.toInt) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Int]
+      }
+    }
   }
 
   case class SFIXED64(label: ProtoFieldLabel) extends ProtoFieldType[Long] {
@@ -138,7 +242,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Long): Int = computeSFixed64SizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Long): Unit = output.writeSFixed64(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Long): Unit = output.writeSFixed64NoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Long = value.toString.toLong
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Long] = {
+      trye(value.toString.toLong) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Long]
+      }
+    }
   }
 
   case class BOOL(label: ProtoFieldLabel) extends ProtoFieldType[Boolean] {
@@ -147,7 +256,12 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Boolean): Int = computeBoolSizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Boolean): Unit = output.writeBool(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Boolean): Unit = output.writeBoolNoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Boolean = value.toString.toBoolean
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Boolean] = {
+      trye(value.toString.toBoolean) match {
+        case Right(v) => v.successNel[String]
+        case Left(e) => e.getMessage.failureNel[Boolean]
+      }
+    }
   }
 
   case class STRING(label: ProtoFieldLabel) extends ProtoFieldType[String] {
@@ -156,7 +270,7 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: String): Int = computeBytesSizeNoTag(getByteString(value))
     override def write(output: CodedOutputStream, tag: Int, value: String): Unit = output.writeBytes(tag, getByteString(value))
     override def writeNoTag(output: CodedOutputStream, value: String): Unit = output.writeBytesNoTag(getByteString(value))
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): String = value.toString
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, String] = value.toString.successNel[String]
   }
 
   case class BYTES(label: ProtoFieldLabel) extends ProtoFieldType[ByteString] {
@@ -165,7 +279,9 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: ByteString): Int = computeBytesSizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: ByteString): Unit = output.writeBytes(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: ByteString): Unit = output.writeBytesNoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ByteString = getByteString(value.toString)
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, ByteString] = {
+      getByteString(value.toString).successNel[String]
+    }
   }
 
   case class ENUM(typeName: String, values: Map[String, Int], label: ProtoFieldLabel) extends ProtoFieldType[Int] {
@@ -173,8 +289,8 @@ object ProtoFieldTypes {
     override def computeSizeNoTag(value: Int): Int = computeEnumSizeNoTag(value)
     override def write(output: CodedOutputStream, tag: Int, value: Int): Unit = output.writeEnum(tag, value)
     override def writeNoTag(output: CodedOutputStream, value: Int): Unit = output.writeEnumNoTag(value)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): Int = values.get(value.toString) match {
-      case Some(v) => v
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, Int] = values.get(value.toString) match {
+      case Some(v) => v.successNel[String]
       case None => throw new RuntimeException("not defined enum value!!") // TODO
     }
   }
@@ -186,36 +302,40 @@ object ProtoFieldTypes {
     override def writeNoTag(output: CodedOutputStream, value: ProtoProxyMessageValue[_]): Unit = value.write(output)
     override def computeSizeNoTag(value: ProtoProxyMessageValue[_]): Int = value.serializedSize
     override def write(output: CodedOutputStream, tag: Int, value: ProtoProxyMessageValue[_]): Unit = value.write(output)
-    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ProtoProxyMessageValue[_] = {
+    override def cast(value: Any, dependencies: Map[String, List[ProtoField]], tag: Int): ValidationNel[String, ProtoProxyMessageValue[_]] = {
       dependencies.get(typeName) match {
         case Some(dep) => {
-          val list = dep.flatMap(_.toValue(value.asInstanceOf[Map[Any, Any]], dependencies))
-          ProtoProxyMessageValue(MESSAGE(typeName, label), list, tag)
+          dep.map(_.toValue(value.asInstanceOf[Map[Any, Any]], dependencies)).sequenceU match {
+            case Success(value) => ProtoProxyMessageValue(MESSAGE(typeName, label), value.flatten, tag).successNel[String]
+            case Failure(errors) => errors.toList.mkString(",").failureNel[ProtoProxyMessageValue[_]]
+          }
         }
-        case None => throw new RuntimeException(s"cannot find '${typeName}'.")
+        case None => {
+          // TODO
+          throw new RuntimeException(s"cannot find '${typeName}'.")
+        }
       }
     }
   }
 
-  def valueOf(typeName: String, label: MessageType.Label): ProtoFieldType[_] = {
-    val convertedLabel = ProtoFieldLabel.valueOf(label)
+  def valueOf(typeName: String, label: ProtoFieldLabel): ProtoFieldType[_] = {
     typeName match {
-      case "double" => DOUBLE(convertedLabel)
-      case "float" => FLOAT(convertedLabel)
-      case "int32" => INT32(convertedLabel)
-      case "int64" => INT64(convertedLabel)
-      case "uint32" => UINT32(convertedLabel)
-      case "uint64" => UINT64(convertedLabel)
-      case "sint32" => SINT32(convertedLabel)
-      case "sint64" => SINT64(convertedLabel)
-      case "fixed32" => FIXED32(convertedLabel)
-      case "fixed64" => FIXED64(convertedLabel)
-      case "sfixed32" => SFIXED32(convertedLabel)
-      case "sfixed64" => SFIXED64(convertedLabel)
-      case "bool" => BOOL(convertedLabel)
-      case "string" => STRING(convertedLabel)
-      case "bytes" => BYTES(convertedLabel)
-      case _ => MESSAGE(typeName, convertedLabel)
+      case "double" => DOUBLE(label)
+      case "float" => FLOAT(label)
+      case "int32" => INT32(label)
+      case "int64" => INT64(label)
+      case "uint32" => UINT32(label)
+      case "uint64" => UINT64(label)
+      case "sint32" => SINT32(label)
+      case "sint64" => SINT64(label)
+      case "fixed32" => FIXED32(label)
+      case "fixed64" => FIXED64(label)
+      case "sfixed32" => SFIXED32(label)
+      case "sfixed64" => SFIXED64(label)
+      case "bool" => BOOL(label)
+      case "string" => STRING(label)
+      case "bytes" => BYTES(label)
+      case _ => MESSAGE(typeName, label)
     }
   }
 

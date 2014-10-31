@@ -124,6 +124,10 @@ class AeromockRenderException(path: String, cause: Throwable)
   extends AeromockBadImplementation(classOf[AeromockRenderException], cause, path) {
   def this(path: String) = this(path, null)
 }
+
+class AeromockProtoDataViolationException(error: String)
+  extends AeromockBadImplementation(classOf[AeromockProtoDataViolationException], null, error) {
+}
 // BadImplementation END
 
 // MethodNotAllowed START

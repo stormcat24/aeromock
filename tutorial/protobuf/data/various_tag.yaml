@@ -1,0 +1,9 @@
+__type: VariousTagResponse
+int32_1: 100
+int32_64: 200
+int32_128: 3000
+list: 100
+list2:
+  - 100
+option1: aaa
+test: bbb

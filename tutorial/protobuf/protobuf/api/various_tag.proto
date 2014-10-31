@@ -1,0 +1,21 @@
+package protobuf.api;
+
+message VariousTagRequest {
+  required string text = 1;
+}
+
+message VariousTagResponse {
+
+// REQUIRED
+  required int32 int32_1 = 1;
+  required int32 int32_16 = 16;
+  required int32 int32_32 = 64;
+  repeated int32 list = 100;
+  repeated bool list2 = 200;
+  optional int32 option1 = 300;
+  hogehoge int32 test = 400;
+
+// OPTIONAL
+
+// REPEATED
+}

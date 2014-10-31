@@ -7,6 +7,7 @@ import scala.language.experimental
 import scala.reflect.ClassTag
 import jp.co.cyberagent.aeromock.helper._
 import scala.language.existentials
+import scalaz._
 
 /**
  *
@@ -25,17 +26,21 @@ package object protobuf {
 
   val TypeString = classOf[String]
   val TypeInt = classOf[Int]
+  val TypeShort = classOf[Short]
   val TypeLong = classOf[Long]
   val TypeFloat = classOf[Float]
   val TypeDouble = classOf[Double]
+  val TypeBoolean = classOf[Boolean]
 
   private[protobuf] def doCast[A](value: String)(implicit tag: ClassTag[A]): Either[Throwable, A] = {
     trye((implicitly[ClassTag[A]].runtimeClass match {
       case TypeString => value.toString
       case TypeInt => value.toInt
+      case TypeShort => value.toShort
       case TypeLong => value.toLong
       case TypeFloat => value.toFloat
       case TypeDouble => value.toDouble
+      case TypeBoolean => value.toBoolean
     }).asInstanceOf[A])
   }
 
@@ -45,13 +50,13 @@ package object protobuf {
     tag: Int
   ) {
 
-    def toValue(data: Any, dependencies: Map[String, List[ProtoField]]): Option[ProtoProxyValue[_, _]] = {
+    def toValue(data: Any, dependencies: Map[String, List[ProtoField]]): ValidationNel[String, Option[ProtoProxyValue[_, _]]] = {
       val dataMap = data.asInstanceOf[Map[Any, Any]]
-      `type`.toValue(dataMap.get(name), tag, dependencies)
+      `type`.toValue(name, dataMap.get(name), tag, dependencies)
     }
   }
 
-  trait ProtoProxyValue[A, B] {
+  trait ProtoProxyValue[A, +B] {
     val field: ProtoFieldType[A]
     val value: B
     val tag: Int
@@ -79,7 +84,7 @@ package object protobuf {
           case v @ ProtoProxyMessageValue(_, _, ttag) => computeTagSize(ttag) + v.serializedSize
           case _ => field.computeSizeNoTag(right)
         })
-      }) + value.size
+      }) + (value.size * computeTagSize(tag))
     }
     override def write(output: CodedOutputStream): Unit = value.map(field.write(output, tag, _))
   }
